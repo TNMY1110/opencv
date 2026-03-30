@@ -30,3 +30,6 @@ k = cv.waitKey(0)
 if k == ord("s"):
     cv.imwrite("./save/my_id_card.png", img)
     cv.destroyAllWindows()
+
+if k == ord('q'):
+        cv.destroyAllWindows()
