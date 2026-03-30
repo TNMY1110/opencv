@@ -9,7 +9,7 @@ img_copy = img.copy()  # 백 버퍼 역할 (원본 보존)
 
 # mouse callback function
 def draw_circle(event,x,y,flags,param):
-    global ix, iy, drawing, img, img_copy
+    global ix, iy, drawing, img, img_copy, cropped
 
     if event == cv.EVENT_LBUTTONDOWN:
         drawing = True
@@ -32,6 +32,11 @@ def draw_circle(event,x,y,flags,param):
         text_y = iy + text_h + 5
         
         cv.putText(img, text, (text_x, text_y), font, 1, (255,255,255), 1, cv.LINE_AA)
+
+        x1, y1 = min(ix, x), min(iy, y)  # 드래그 방향 상관없이 정렬
+        x2, y2 = max(ix, x), max(iy, y)
+        cropped = img[y1:y2, x1:x2]  # y: 100~300, x: 200~400
+        
         img_copy = img.copy()
 
 cv.namedWindow('image')
@@ -43,6 +48,7 @@ while(1):
 
     if k == ord("s"):
         cv.imwrite("./save/my_id_card_final.png", img)
+        cv.imwrite("./save/my_id_card_final_sq.png", cropped)
         break
     elif k == ord("q"):
         break
