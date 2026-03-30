@@ -23,20 +23,22 @@ def draw_circle(event,x,y,flags,param):
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
         cv.rectangle(img, (ix,iy), (x,y), (0,255,0), 2)
-        font = cv.FONT_HERSHEY_SIMPLEX
-        
-        text = 'face'
-        # getTextSize의 반환값은 (너비, 높이), baseline이므로 (text_w, text_h), _에 받음
-        (text_w, text_h), _ = cv.getTextSize(text, font, 1, 1)
-        text_x = (ix + x) // 2 - text_w // 2
-        text_y = iy + text_h + 5
-        
-        cv.putText(img, text, (text_x, text_y), font, 1, (255,255,255), 1, cv.LINE_AA)
 
         x1, y1 = min(ix, x), min(iy, y)  # 드래그 방향 상관없이 정렬
         x2, y2 = max(ix, x), max(iy, y)
-        cropped = img[y1:y2, x1:x2]  # y: 100~300, x: 200~400
+
+        font = cv.FONT_HERSHEY_SIMPLEX
+        text = 'face'
+
+        # getTextSize의 반환값은 (너비, 높이), baseline이므로 (text_w, text_h), _에 받음
+        (text_w, text_h), _ = cv.getTextSize(text, font, 1, 1)
+        text_x = (x1 + x2) // 2 - text_w // 2  # 가로 중앙
+        text_y = y1 + text_h + 5               # 상단에서 약간 아래
         
+        cv.putText(img, text, (text_x, text_y), font, 1, (255,255,255), 1, cv.LINE_AA)
+
+        cropped = img[y1:y2, x1:x2]
+
         img_copy = img.copy()
 
 cv.namedWindow('image')
