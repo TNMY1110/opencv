@@ -12,8 +12,11 @@ def get_sample(filename, flags=cv.IMREAD_COLOR):
 
 # img = cv.imread("./samples/starry_night.jpg")
 # img_gray = cv.imread("./samples/starry_night.jpg", cv.IMREAD_GRAYSCALE)
-img = get_sample("orange.jpg")
-img_gray = get_sample("orange.jpg", cv.IMREAD_GRAYSCALE)
+filename = "orange.jpg"
+basename = os.path.splitext(filename)[0]  # "starry_night"
+
+img = get_sample(filename)
+img_gray = get_sample(filename, cv.IMREAD_GRAYSCALE)
 
 if img is None:
     sys.exit("Could not read the image.")
@@ -36,5 +39,5 @@ k = cv.waitKey(0)
 
 # 파일 저장
 if k == ord("s"):
-    cv.imwrite("./save/orange.png", img)
-    cv.imwrite("./save/orange_gray.png", img_gray)
+    cv.imwrite("./save/{basename}.png", img)
+    cv.imwrite("./save/{basename}_gray.png", img_gray)
