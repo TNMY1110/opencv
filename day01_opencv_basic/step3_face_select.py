@@ -2,15 +2,14 @@ import numpy as np
 import cv2 as cv
 
 drawing = False # true if mouse is pressed
-mode = True # if True, draw rectangle. Press 'm' to toggle to curve
 ix,iy = -1,-1
 
-img = np.zeros((512,512,3), np.uint8)
+img = cv.imread("./save/my_id_card.png")
 img_copy = img.copy()  # 백 버퍼 역할 (원본 보존)
 
 # mouse callback function
 def draw_circle(event,x,y,flags,param):
-    global ix, iy, drawing, mode, img, img_copy
+    global ix, iy, drawing, img, img_copy
 
     if event == cv.EVENT_LBUTTONDOWN:
         drawing = True
@@ -19,18 +18,20 @@ def draw_circle(event,x,y,flags,param):
     elif event == cv.EVENT_MOUSEMOVE:
         if drawing == True:
             img = img_copy.copy()  # 매 프레임 원본으로 초기화
-            if mode == True:
-                cv.rectangle(img,(ix,iy),(x,y),(0,255,0),1)
-            else:
-                cv.circle(img,(x,y),5,(0,0,255),1)
+            cv.rectangle(img, (ix,iy), (x,y), (0,255,0), 2)
 
     elif event == cv.EVENT_LBUTTONUP:
         drawing = False
-        if mode == True:
-            cv.rectangle(img,(ix,iy),(x,y),(0,255,0),1)
-        else:
-            cv.circle(img,(x,y),5,(0,0,255),1)
-
+        cv.rectangle(img, (ix,iy), (x,y), (0,255,0), 2)
+        font = cv.FONT_HERSHEY_SIMPLEX
+        
+        text = 'face'
+        # getTextSize의 반환값은 (너비, 높이), baseline이므로 (text_w, text_h), _에 받음
+        (text_w, text_h), _ = cv.getTextSize(text, font, 1, 1)
+        text_x = (ix + x) // 2 - text_w // 2
+        text_y = iy + text_h + 5
+        
+        cv.putText(img, text, (text_x, text_y), font, 1, (255,255,255), 1, cv.LINE_AA)
         img_copy = img.copy()
 
 cv.namedWindow('image')
@@ -39,9 +40,11 @@ cv.setMouseCallback('image',draw_circle)
 while(1):
     cv.imshow('image',img)
     k = cv.waitKey(1) & 0xFF
-    if k == ord('m'):
-        mode = not mode
-    elif k == 27:
+
+    if k == ord("s"):
+        cv.imwrite("./save/my_id_card_final.png", img)
         break
- 
+    elif k == ord("q"):
+        break
+
 cv.destroyAllWindows()
