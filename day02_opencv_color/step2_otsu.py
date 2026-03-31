@@ -28,17 +28,18 @@ while(1):
     Glo_thr = cv.getTrackbarPos('Global_thr', 'thr')
     mode_val = cv.getTrackbarPos('0 : OFF \n1 : ON', 'thr')
 
-    if  mode_val == 0:
-        _, th1 = cv.threshold(img, Glo_thr, 255, cv.THRESH_BINARY)
-
-    elif  mode_val == 1:
-        _, th1 = cv.threshold(img, Glo_thr, 255, cv.THRESH_BINARY_INV)
+    _, th1 = cv.threshold(img, Glo_thr, 255, cv.THRESH_BINARY)
 
     ret, th2 = cv.threshold(img, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
     cv.putText(th2, f"Otsu: {int(ret)}", (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, 150, 2)
 
-    result = np.hstack([img, th1, th2])
-    cv.imshow('thr', result)
+    if  mode_val == 0:
+        result = np.hstack([img, th2])
+        cv.imshow('thr', result)
+
+    elif  mode_val == 1:
+        result = np.hstack([img, th1, th2])
+        cv.imshow('thr', result)
 
     k = cv.waitKey(5) & 0xFF
 
