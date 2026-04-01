@@ -7,16 +7,20 @@ if not cap.isOpened():
     print("웹캠을 열 수 없습니다")
     exit()
 
-cv.namedWindow('Line Tracing Stage 2', cv.WINDOW_NORMAL)
+cv.namedWindow('Line Tracing Stage 2', cv.WINDOW_AUTOSIZE)
 
 while True:
     ret, frame = cap.read()
     if not ret:
         break
 
-    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
-
+    # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    # _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    lower_black = np.array([0, 0, 0])
+    upper_black = np.array([179, 70, 70])  # S, V 둘 다 낮아야 검정
+    binary = cv.inRange(hsv, lower_black, upper_black)
+    
     # --- 새로 추가: 노이즈 제거 ---
     # 메디안 필터
     binary = cv.medianBlur(binary, 5)
@@ -50,8 +54,8 @@ while True:
             vx, vy, x, y = cv.fitLine(largest_cnt, cv.DIST_L2, 0, 0.01, 0.01)
             
             # 각도 계산
-            angle = np.arctan2(vy, vx) * 180 / np.pi
-
+            # angle = np.arctan2(vy, vx) * 180 / np.pi
+            angle = np.arctan2(vy[0], vx[0]) * 180 / np.pi  # [0]으로 스칼라 추출
             # --- 새로 추가: 제어신호 생성 ---
             frame_center_x = frame.shape[1] // 2
             error = cx - frame_center_x
