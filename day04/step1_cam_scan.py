@@ -9,7 +9,7 @@ import matplotlib.pylab as plt
 # ============================================================
 # 전역 변수
 # ============================================================
-win_name = "Document Scanning"
+win_name = "WebCam Scanning"
 img = None
 draw = None
 rows, cols = 0, 0
@@ -18,15 +18,6 @@ pts = np.zeros((4, 2), dtype=np.float32)
 frozen = False
 
 cap = cv.VideoCapture(0)
-
-def get_sample(filename, repo='insightbook'):
-    if not os.path.exists(filename):
-        if repo == 'insightbook':
-            url = f"https://raw.githubusercontent.com/dltpdn/insightbook.opencv_project_python/master/img/{filename}"
-        else:  # opencv 공식
-            url = f"https://raw.githubusercontent.com/opencv/opencv/master/samples/data/{filename}"
-        urllib.request.urlretrieve(url, filename)
-    return filename
 
 def onMouse(event, x, y, flags, param):
     global pts_cnt, draw, pts, img, frozen
@@ -73,7 +64,7 @@ def onMouse(event, x, y, flags, param):
 
             # 결과 저장
             cv.imshow("Scan", draw)
-            cv.imwrite("cam_scan.png", dst)
+            cv.imwrite("./img/cam_scan.png", dst)
 
             # 초기화 (새로운 이미지 스캔 가능)
             pts_cnt = 0

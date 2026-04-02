@@ -22,7 +22,7 @@ def get_sample(filename, repo='insightbook'):
             url = f"https://raw.githubusercontent.com/dltpdn/insightbook.opencv_project_python/master/img/{filename}"
         else:  # opencv 공식
             url = f"https://raw.githubusercontent.com/opencv/opencv/master/samples/data/{filename}"
-        urllib.request.urlretrieve(url, filename)
+        urllib.request.urlretrieve(url, f"./img/{filename}")
     return filename
 
 def onMouse(event, x, y, flags, param):
@@ -70,7 +70,7 @@ def onMouse(event, x, y, flags, param):
             plt.show()
 
             # 결과 저장
-            cv.imwrite("paper_scan.png", dst)
+            cv.imwrite("./img/paper_scan.png", dst)
 
             # 초기화 (새로운 이미지 스캔 가능)
             pts_cnt = 0
