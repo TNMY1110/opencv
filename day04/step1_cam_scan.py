@@ -15,6 +15,7 @@ draw = None
 rows, cols = 0, 0
 pts_cnt = 0
 pts = np.zeros((4, 2), dtype=np.float32)
+frozen = False
 
 cap = cv.VideoCapture(0)
 
@@ -28,16 +29,21 @@ def get_sample(filename, repo='insightbook'):
     return filename
 
 def onMouse(event, x, y, flags, param):
-    global pts_cnt, draw, pts, img
+    global pts_cnt, draw, pts, img, frozen
     
     if event == cv.EVENT_LBUTTONDOWN:
+        if not frozen:
+            # 첫 클릭 시 프레임 고정
+            frozen = True
+        
         # 1️⃣ 클릭한 위치에 원 표시
         cv.circle(draw, (x, y), 5, (0,255,0), -1)
-
+        
         # 2️⃣ 좌표 저장
         pts[pts_cnt] = [x, y]
         pts_cnt += 1
         
+        draw = draw.copy()
         cv.imshow("Scan", draw)
 
         # 3️⃣ 4개 점 수집 완료 → 좌표 정렬 + 변환
@@ -66,17 +72,18 @@ def onMouse(event, x, y, flags, param):
             plt.show()
 
             # 결과 저장
+            cv.imshow("Scan", draw)
             cv.imwrite("cam_scan.png", dst)
 
             # 초기화 (새로운 이미지 스캔 가능)
             pts_cnt = 0
             pts = np.zeros((4, 2), dtype=np.float32)
-            draw = img.copy()
-            cv.imshow("Scan", draw)
+            frozen = False
 
 # ============================================================
 # 메인 실행
 # ============================================================
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -84,8 +91,10 @@ while True:
     
     # 프레임 크기 조정 (보기 좋게)
     frame = cv.resize(frame, (800, 600))
-    img = frame.copy()
-    draw = frame.copy()
+
+    if not frozen:
+        img = frame.copy()
+        draw = frame.copy()
     
     cv.imshow(win_name, draw)
     cv.setMouseCallback(win_name, onMouse)
