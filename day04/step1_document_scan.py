@@ -23,7 +23,7 @@ def get_sample(filename, repo='insightbook'):
         else:  # opencv 공식
             url = f"https://raw.githubusercontent.com/opencv/opencv/master/samples/data/{filename}"
         urllib.request.urlretrieve(url, f"./img/{filename}")
-    return filename
+    return f"./img/{filename}"
 
 def onMouse(event, x, y, flags, param):
     """
