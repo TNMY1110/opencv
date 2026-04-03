@@ -14,6 +14,9 @@ cap = cv.VideoCapture(0)
 lower_color = np.array([50, 0, 0])
 upper_color = np.array([100, 255, 255])
 
+lower_red = np.array([0, 0, 0])
+upper_red = np.array([30, 255, 255])
+
 # 감지 면적 임계값 설정
 MIN_AREA = 5000
 
@@ -21,9 +24,12 @@ cur_state = False
 before_state = False
 
 # 변수 초기화
-prev_time = time.time()
-fps = 0
-fps_list = []
+prev_time = time.time()     # 이전 시간
+fps = 0                     # fps
+fps_list = []               # fps 리스트
+
+reaction_times = []         # 반응 시간 기록 리스트
+state_change_time = None    # 상태 변화 감지 시점
 
 # 함수
 def send_command(ser, command):
@@ -62,17 +68,20 @@ while(1):
     if elapsed > 0:
         fps_list.append(1 / elapsed)
 
-    if len(fps_list) > 30:       # 최근 30프레임 평균
-        fps_list.pop(0)
-        
-    fps = sum(fps_list) / len(fps_list)
+    if len(fps_list) > 30:      # 최근 30프레임 평균
+        fps_list.pop(0)         # 넘어가면 제거
+
+    fps = sum(fps_list) / len(fps_list)     # 평균 구하기
     prev_time = cur_time
 
 #   HSV 색공간으로 변환
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
 #   마스크 생성
-    mask = cv.inRange(hsv, lower_color, upper_color)
+    mask_green = cv.inRange(hsv, lower_color, upper_color)
+    mask_red = cv.inRange(hsv, lower_red, upper_red)
+
+    mask = cv.bitwise_or(mask_green, mask_red)
 
 #   모폴로지 연산으로 노이즈 제거
     kernel = np.ones((5, 5), np.uint8)
@@ -119,6 +128,7 @@ while(1):
         cv.putText(res, f"Area: {area:.0f}", (10, 30),
                 cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
+    # fps 표시
     cv.putText(frame, f"FPS: {fps:.1f}", (10, 30),
                cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
 
@@ -128,6 +138,8 @@ while(1):
 
 #   상태가 이전 상태와 다르면 아두이노에 명령 전송
     if cur_state != before_state:
+        state_change_time = time.time()
+
         if cur_state:
             com_result = send_command(ser, 'O')
             
@@ -135,7 +147,12 @@ while(1):
             com_result = send_command(ser, 'C')
 
         if com_result:
+            reaction_time = (time.time() - state_change_time) * 1000  # ms 단위
+            reaction_times.append(reaction_time)
+
             before_state = cur_state
+
+            print(f"✅ PASS: 반응 시간: {reaction_time:.2f}ms")
             print("✅ PASS: 아두이노 명령 전송 성공!")
 
         else:
