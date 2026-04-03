@@ -72,7 +72,7 @@ while(1):
     mask = cv.morphologyEx(mask, cv.MORPH_CLOSE, kernel)  # 구멍 메우기
 
     h, w = frame.shape[:2]      # 높이, 너비
-    rect_w, rect_h = 320, 240   # 사각형 높이, 너비
+    rect_w, rect_h = w // 2, h // 2   # 사각형 높이, 너비
 
     # 좌상단 좌표
     x1 = w // 2 - rect_w // 2

@@ -37,7 +37,7 @@ state_change_time = None    # 상태 변화 감지 시점
 def send_command(ser, command):
     try:
         ser.write((command + '\n').encode('utf-8'))
-        return True  # 블로킹 없음
+        return True
     
     except Exception as e: # 오류시
         return False
@@ -134,6 +134,16 @@ while(1):
     cv.putText(frame, f"FPS: {fps:.1f}", (10, 30),
                cv.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
 
+    if state_change_time is not None:
+        if ser.in_waiting > 0:
+            response = ser.readline().decode('utf-8').strip()
+
+            if response == "OK":
+                reaction_time = (time.time() - state_change_time) * 1000
+                reaction_times.append(reaction_time)
+                print(f"✅ 서보 완료까지 반응 시간: {reaction_time:.1f}ms")
+                state_change_time = None  # 초기화
+
     cv.imshow('frame',frame)
     cv.imshow('mask',mask)
     cv.imshow('res',res)
@@ -149,16 +159,11 @@ while(1):
             com_result = send_command(ser, 'C')
 
         if com_result:
-            reaction_time = (time.time() - state_change_time) * 1000  # ms 단위
-            reaction_times.append(reaction_time)
-
             before_state = cur_state
-
-            print(f"✅ PASS: 반응 시간: {reaction_time:.2f}ms")
             print("✅ PASS: 아두이노 명령 전송 성공!")
 
         else:
-            print("❌ FAIL: send_command() 함수가 아직 구현되지 않았습니다")
+            print("❌ FAIL: send_command 실패")
 
     # 'q' 키 입력 시 루프 종료
     k = cv.waitKey(5)
