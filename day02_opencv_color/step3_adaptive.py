@@ -49,6 +49,7 @@ while(1):
     top  = np.hstack([th1, th2])
     bottom = np.hstack([th3, th4])
     result = np.vstack([top, bottom])
+    # result = np.hstack([th3, th4])
     cv.imshow('thr', result)
 
     k = cv.waitKey(5) & 0xFF

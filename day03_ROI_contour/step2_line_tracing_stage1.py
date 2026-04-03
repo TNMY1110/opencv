@@ -18,16 +18,20 @@ while True:
         break
 
     # 그레이스케일 변환
-    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
-    # gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    # hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-    lower_black = np.array([0, 0, 0])
-    upper_black = np.array([179, 70, 70])  # S, V 둘 다 낮아야 검정
+    # lower_black = np.array([0, 0, 0])
+    # upper_black = np.array([179, 70, 70])  # S, V 둘 다 낮아야 검정
 
-    binary = cv.inRange(hsv, lower_black, upper_black)
+    # binary = cv.inRange(hsv, lower_black, upper_black)
     # 이진화 (Otsu 사용)
-    # _, binary = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
-    # adapt = cv.adaptiveThreshold(binary, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C, cv.THRESH_BINARY, 11, 2)
+    ret, _ = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
+    _, binary = cv.threshold(gray, ret - 50, 255, cv.THRESH_BINARY_INV)
+
+    kernel = cv.getStructuringElement(cv.MORPH_ELLIPSE, (5, 5))
+    binary = cv.morphologyEx(binary, cv.MORPH_OPEN, kernel)
+    binary = cv.morphologyEx(binary, cv.MORPH_CLOSE, kernel)  # 구멍 메우기
 
     # 컨투어 검출
     contours, _ = cv.findContours(binary, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
