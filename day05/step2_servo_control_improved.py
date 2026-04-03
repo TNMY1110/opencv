@@ -6,6 +6,8 @@ import time
 
 # 아두이노 시리얼 연결 (COM 포트, 9600 속도)
 ser = serial.Serial('COM3', 9600, timeout=1)
+if ser.is_open:
+    print("✅ 아두이노 연결 성공")
 
 # 웹캠을 열기
 cap = cv.VideoCapture(0)
