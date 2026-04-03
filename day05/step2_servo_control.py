@@ -5,25 +5,29 @@ import serial
 import time
 
 # 아두이노 시리얼 연결 (COM 포트, 9600 속도)
-ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
-time.sleep(2)  # 리셋
+ser = serial.Serial('COM3', 9600, timeout=1)
 
 # 웹캠을 열기
 cap = cv.VideoCapture(0)
 
 # 색상 범위 설정 (과제 1에서 확인한 값)
 lower_color = np.array([50, 0, 0])
-upper_color = np.array([179, 255, 255])
+upper_color = np.array([100, 255, 255])
 
 # 감지 면적 임계값 설정
 MIN_AREA = 5000
 
-cur_state = 0       # 추가 설정 예정
-before_state = 0    # 추가 설정 예정
+cur_state = False
+before_state = False
 
 # 함수
 def send_command(ser, command):
-    return False   # 지금은 항상 False 반환
+    try:
+        ser.write((command + '\n').encode('utf-8'))
+        return True  # 블로킹 없음
+    
+    except Exception as e: # 오류시
+        return False
 
 def detect_color(frame):
     # 마스크 픽셀 면적 계산
@@ -88,10 +92,12 @@ while(1):
 #   현재는 최소 크기 이상의 색 있는 물체가 감지됐을 경우 화면에 초록색으로 픽셀 크기 출력
 #   면적과 임계값 비교하여 상태 결정
     if area > MIN_AREA:
+        cur_state = True
         cv.putText(res, f"Area: {area:.0f}", (10, 30),
                 cv.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
     
     else:
+        cur_state = False
         cv.putText(res, f"Area: {area:.0f}", (10, 30),
                 cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     
@@ -101,9 +107,14 @@ while(1):
 
 #   상태가 이전 상태와 다르면 아두이노에 명령 전송
     if cur_state != before_state:
-        com_result = send_command(ser, 'O')
+        if cur_state:
+            com_result = send_command(ser, 'O')
+            
+        else:
+            com_result = send_command(ser, 'C')
 
         if com_result:
+            before_state = cur_state
             print("✅ PASS: 아두이노 명령 전송 성공!")
         else:
             print("❌ FAIL: send_command() 함수가 아직 구현되지 않았습니다")
