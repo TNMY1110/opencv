@@ -13,10 +13,10 @@ if ser.is_open:
 cap = cv.VideoCapture(0)
 
 # 색상 범위 설정 (과제 1에서 확인한 값)
-lower_color = np.array([50, 0, 0])
+lower_color = np.array([50, 50, 50])
 upper_color = np.array([100, 255, 255])
 
-lower_red = np.array([0, 0, 0])
+lower_red = np.array([0, 100, 100])
 upper_red = np.array([30, 255, 255])
 
 # 감지 면적 임계값 설정
