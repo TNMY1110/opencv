@@ -40,6 +40,9 @@ top_left = max_loc  # TM_CCOEFF_NORMED에서는 max_loc이 최적
 h, w = template.shape[:2]
 bottom_right = (top_left[0] + w, top_left[1] + h)
 
+print(f"최적 위치: {top_left}")
+print(f"유사도 점수: {max_val:.4f}")
+
 # 결과 표시
 result_img = img.copy()
 cv.rectangle(result_img, top_left, bottom_right, (0, 255, 0), 2)
