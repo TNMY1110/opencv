@@ -3,14 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sample_download import get_sample
 
-def draw_matches(img1, kp1, img2, kp2, matches, title="Feature Matching", mask=None, draw_params=None):
+def draw_matches(img1, kp1, img2, kp2, matches, title="Feature Matching", mask=None):
     draw_params = dict(
-        matchColor=(0, 255, 0),        # 매칭 선 색상 (초록색)
-        singlePointColor=(255, 0, 0),  # 매칭되지 않은 특징점 색상 (빨간색)
-        matchesMask=mask,
-        flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
-    )
-
+            matchColor=(0, 255, 0),
+            singlePointColor=None,
+            matchesMask=mask,
+            flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
+        )
+    
     res = cv.drawMatches(img1, kp1, img2, kp2, matches, None, **draw_params)
     
     # Matplotlib 출력
@@ -98,7 +98,7 @@ if len(good_matches) >= MIN_MATCH_COUNT:
     dst_pts = np.float32([kp2[m.trainIdx].pt for m in good_matches]).reshape(-1, 1, 2)
     
     # TODO: 호모그래피 행렬 계산 (RANSAC 사용)
-    M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 1.0)
+    M, mask = cv.findHomography(src_pts, dst_pts, cv.RANSAC, 5.0)
     
     if M is not None:
         # TODO: img1의 네 모서리를 이미지 좌표 배열로 정의
@@ -127,12 +127,6 @@ if len(good_matches) >= MIN_MATCH_COUNT:
         
         # ========== Step 3: 매칭 시각화 (inlier만) ==========
         matchesMask = mask.ravel().tolist()
-        draw_params = dict(
-            matchColor=(0, 255, 0),
-            singlePointColor=None,
-            matchesMask=matchesMask,
-            flags=cv.DrawMatchesFlags_NOT_DRAW_SINGLE_POINTS
-        )
 
         draw_matches(img1, kp1, result_img, kp2, good_matches, title="After Lowe's Ratio Test", mask=matchesMask)
 
