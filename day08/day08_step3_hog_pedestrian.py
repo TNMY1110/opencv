@@ -4,7 +4,7 @@ import urllib.request
 from sample_download import get_sample
 
 # 방법 1: 강사 제공 샘플 이미지 사용
-img = cv2.imread('./img/pedestrian_01.jpg')
+img = cv2.imread('./img/pedestrian_02.jpg')
 
 if img is None:
     print("Error: 이미지 로드 실패")
@@ -106,8 +106,5 @@ for config in configs:
     cv2.imshow(f"Result - {config['name']}", display_img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    
-    print(f"{config['name']:15s} (winStride={config['winStride']}, scale={config['scale']}): {len(found):3d}명")
 
-# 최고 성능 설정으로 최종 검출
-print("\n✅ 최고 성능 파라미터 선택 (또는 추천값 사용)")
+    print(f"{config['name']:15s} (winStride={config['winStride']}, scale={config['scale']}): {len(found):3d}명")
