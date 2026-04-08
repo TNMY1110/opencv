@@ -201,7 +201,7 @@ while True:
         detections, weights = hog.detectMultiScale(frame, winStride=(8, 8), padding=(16, 16), scale=1.05)
         
         last_detections = [
-            (x, y, w, h) for (x, y, w, h), w in zip(detections, weights) if w > 0.5
+            (int(x), int(y), int(w), int(h)) for (x, y, w, h), w in zip(detections, weights) if w > 0.5
         ]
         
         elapsed = time.time() - start_time
@@ -246,7 +246,7 @@ while True:
         break
     
     detections, weights = hog.detectMultiScale(frame, winStride=(8, 8), padding=(16, 16), scale=1.05)
-    filtered = [(x, y, w, h) for (x, y, w, h), w in zip(detections, weights) if w > 0.5]
+    filtered = [(int(x), int(y), int(w), int(h)) for (x, y, w, h), w in zip(detections, weights) if w > 0.5]
     
     stats.update(filtered)
     
