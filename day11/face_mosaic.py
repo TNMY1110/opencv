@@ -28,7 +28,7 @@ def apply_mosaic(frame, faces, block_size=15):
     Args:
         frame: 원본 이미지
         faces: Cascade로 검출된 얼굴 목록
-        block_size: 모자이크 블록 크기 (클수록 강함)
+        block_size: 모자이크 블록 크기
     
     Returns:
         모자이크 처리된 이미지
@@ -38,7 +38,7 @@ def apply_mosaic(frame, faces, block_size=15):
         face_roi = frame[y:y+h, x:x+w]
         
         # 축소 (다운샘플링)
-        small = cv2.resize(face_roi, (block_size, block_size))
+        small = cv2.resize(face_roi, (block_size, block_size)) # block_size ^ 2의 크기만큼 줄이는 식이기에 블럭 사이즈가 클수록 덜 뭉개짐
         
         # 다시 확대 (업샘플링) - INTER_NEAREST: 블록화 효과
         mosaic = cv2.resize(small, (w, h), interpolation=cv2.INTER_NEAREST)
